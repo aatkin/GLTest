@@ -88,7 +88,7 @@ int main()
 
     float vertices[] =
     {
-        0.0f,  0.5f,
+        0.05f,  0.5f,
         0.5f, -0.5f,
         -0.5f, -0.5f
     };
@@ -99,8 +99,8 @@ int main()
     std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
     /** Load shaders for OpenGL to use. */
-    GLuint vertexShader = loadShaderFromFile("/home/anssi/Coding/C/GLTest/shaders/triangle.vert", GL_VERTEX_SHADER);
-    GLuint fragmentShader = loadShaderFromFile("/home/anssi/Coding/C/GLTest/shaders/triangle.frag", GL_FRAGMENT_SHADER);
+    GLuint vertexShader = loadShaderFromFile("shaders/triangle.vert", GL_VERTEX_SHADER);
+    GLuint fragmentShader = loadShaderFromFile("shaders/triangle.frag", GL_FRAGMENT_SHADER);
 
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
