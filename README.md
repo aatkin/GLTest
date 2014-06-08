@@ -13,12 +13,12 @@ Before building dependencies, you should have [CMake](http://www.cmake.org/) ins
 
 GLFW and GLEW dependencies need to be built and linked to the project before the project can be built. Easiest way (in my opinion) is to use the makefiles in both libraries and link statically:
   - GLFW3
-        `$ cd glfw-3.0.4 && sudo cmake "Unix Makefiles" && sudo make && sudo make install`
+    - `$ cd glfw-3.0.4 && sudo cmake "Unix Makefiles" && sudo make && sudo make install`
   - GLEW
-        `$ cd glew-1.10.0 && sudo make && sudo make install`
+    - `$ cd glew-1.10.0 && sudo make && sudo make install`
 
 GCC should find these libraries by default at build-time. Last thing to do is to compile and build:
-        `$ g++ -std=c++11 -c src/main.cpp>`
-        `$ g++ main.o -o main -lglfw3 -lGLEW -lGL -lGLU -lX11 -lXxf86vm -lXrandr -lpthread -lXi`
+  - `$ g++ -std=c++11 -c src/main.cpp>`
+  - `$ g++ main.o -o main -lglfw3 -lGLEW -lGL -lGLU -lX11 -lXxf86vm -lXrandr -lpthread -lXi`
 
 If the compiler complains about missing libraries (like Xxf86vm), google them up and install as needed.
