@@ -18,7 +18,7 @@ GLFW and GLEW dependencies need to be built and linked to the project before the
     - `$ cd glew-1.10.0 && sudo make && sudo make install`
 
 GCC should find these libraries by default at build-time. Last thing to do is to compile and build:
-  - `$ g++ -std=c++11 -c src/main.cpp>`
+  - `$ g++ -std=c++11 -c src/main.cpp`
   - `$ g++ main.o -o main -lglfw3 -lGLEW -lGL -lGLU -lX11 -lXxf86vm -lXrandr -lpthread -lXi`
 
 If the compiler complains about missing libraries (like Xxf86vm), google them up and install as needed.
