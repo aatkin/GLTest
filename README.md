@@ -17,6 +17,9 @@ GLFW and GLEW dependencies need to be built and linked to the project before the
   - GLEW
     - `$ cd glew-1.10.0 && sudo make && sudo make install`
 
+If CMake fails with an error, you might be missing some dependencies. You can then try to install the following:
+  - `$ sudo apt-get install cmake xorg-dev libglu1-mesa-dev`
+
 GCC should find these libraries by default at build-time. Last thing to do is to compile and build:
   - `$ g++ -std=c++11 -c src/main.cpp`
   - `$ g++ main.o -o main -lglfw3 -lGLEW -lGL -lGLU -lX11 -lXxf86vm -lXrandr -lpthread -lXi`
