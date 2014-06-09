@@ -1,4 +1,4 @@
-#version 440
+#version 150
 
 in vec2 position;
 
