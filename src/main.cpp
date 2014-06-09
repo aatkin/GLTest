@@ -69,6 +69,11 @@ GLuint loadShaderFromFile( std::string path, GLenum shaderType )
     return shaderID;
 }
 
+void draw_triangle()
+{
+
+}
+
 int main()
 {
     /** Create window and context for OpenGL to draw in. */
@@ -128,16 +133,32 @@ int main()
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    clock_t start_t, end_t;
+    double total;
+    std::string str;
+
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
     {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
+        /** Start timing */
+        start_t = clock();
+
+        /** Clear color bit and buffers, draw stuff and wait for rendering to finish */
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glFinish();
 
+        /** Stop timer and display it on window title */
+        end_t = clock();
+        total = (double)(end_t - start_t);
+        str = std::to_string(total) + "ms";
+        glfwSetWindowTitle(window, str.c_str());
+
+        /** Swap back buffer to front and poll for any events */
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
