@@ -11,7 +11,7 @@ Developed and tested on Ubuntu 14.04 with Geforce GT415M and Nvidia binary drive
 ## Building ##
 Before building dependencies, you should have [CMake](http://www.cmake.org/) installed. CMake should be pretty easy to install using popular package managers, such as `apt`. You should also have fairly modern GPU drivers installed, with support for >=OpenGL 3.2.
 
-GLFW and GLEW dependencies need to be built and linked to the project before the project can be built. Easiest way (in my opinion) is to use the makefiles in both libraries and link statically:
+GLFW and GLEW dependencies need to be built and linked to the project before the project can be built. Easiest way (in my opinion) is to use the makefiles in both libraries:
   - GLFW3
     - `$ cd glfw-3.0.4 && sudo cmake "Unix Makefiles" && sudo make && sudo make install`
   - GLEW
