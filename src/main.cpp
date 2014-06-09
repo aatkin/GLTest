@@ -24,7 +24,7 @@ GLFWwindow *create_glfw()
 
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Hello wurld", nullptr, nullptr); // Windowed
+    GLFWwindow* window = glfwCreateWindow(960, 540, "Hello wurld", nullptr, nullptr); // Windowed
 
     return window;
 }
@@ -78,17 +78,21 @@ int main()
     glewExperimental = GL_TRUE;
     glewInit();
 
-    /** Vertex Array Object */
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
+    /** Vertex Array Object */
+    GLuint vao_triangle;
+    glGenVertexArrays(1, &vao_triangle);
+    glBindVertexArray(vao_triangle);
+
+    /** Vertex Buffer Object */
     GLuint vbo;
     glGenBuffers(1, &vbo);
 
     float vertices[] =
     {
-        0.0f,  0.5f,
+        -0.5f,  0.5f,
+        0.5f, 0.5f,
         0.5f, -0.5f,
         -0.5f, -0.5f
     };
@@ -96,7 +100,18 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
+    /** Element Buffer Object */
+    GLuint elements[] =
+    {
+        0, 1, 2,
+        0, 1, 3
+    };
+
+    GLuint ebo;
+    glGenBuffers(1, &ebo);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
     /** Load shaders for OpenGL to use. */
     GLuint vertexShader = loadShaderFromFile("shaders/triangle.vert", GL_VERTEX_SHADER);
@@ -116,11 +131,13 @@ int main()
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
+
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -132,6 +149,6 @@ int main()
 
     glDeleteBuffers(1, &vbo);
 
-    glDeleteVertexArrays(1, &vao);
+    glDeleteVertexArrays(1, &vao_triangle);
     return 0;
 }
