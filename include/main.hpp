@@ -4,10 +4,8 @@
 #include <ios>
 #include <iostream>
 #include <fstream>
-#include <ctime>
 #include <string>
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GL/glfw3.h>
 
