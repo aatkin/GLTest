@@ -1,10 +1,8 @@
 #ifndef MAIN_HPP_INCLUDED
 #define MAIN_HPP_INCLUDED
 
-#include <ios>
 #include <iostream>
 #include <fstream>
-#include <ctime>
 #include <string>
 
 #include <GL/glew.h>
