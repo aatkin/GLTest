@@ -43,8 +43,8 @@
 			<Add library="gdi32" />
 			<Add library="user32" />
 			<Add library="kernel32" />
-			<Add directory="C:/glfw-3.0.4.bin.WIN32/lib-mingw" />
-			<Add directory="C:/glew-1.10.0/lib" />
+			<Add directory="lib/glew" />
+			<Add directory="lib/glfw" />
 		</Linker>
 		<Unit filename="include/main.hpp" />
 		<Unit filename="shaders/triangle.frag" />
