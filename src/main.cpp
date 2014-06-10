@@ -69,11 +69,6 @@ GLuint loadShaderFromFile( std::string path, GLenum shaderType )
     return shaderID;
 }
 
-void draw_triangle()
-{
-
-}
-
 int main()
 {
     /** Create window and context for OpenGL to draw in. */
@@ -169,6 +164,7 @@ int main()
     glDeleteShader(vertexShader);
 
     glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 
     glDeleteVertexArrays(1, &vao_triangle);
     return 0;
