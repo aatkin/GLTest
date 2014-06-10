@@ -129,7 +129,7 @@ int main()
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     clock_t start_t, end_t;
-    double total;
+    int total;
     std::string str;
 
     /** Main loop of the program. */
@@ -149,13 +149,13 @@ int main()
 
         /** Stop timer and display it on window title */
         end_t = clock();
-        total = (double)(end_t - start_t);
+        total = (int)(end_t - start_t);
         str = std::to_string(total) + "ms";
         glfwSetWindowTitle(window, str.c_str());
 
         /** Swap back buffer to front and poll for any events */
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwWaitEvents();
     }
 
     glfwTerminate();
