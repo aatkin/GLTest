@@ -128,6 +128,10 @@ int main()
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    clock_t start_t, end_t;
+    int total;
+    std::string str;
+
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
     {
@@ -137,9 +141,16 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glFinish();
+
+        /** Stop timer and display it on window title */
+        end_t = clock();
+        total = (int)(end_t - start_t);
+        str = std::to_string(total) + "ms";
+        glfwSetWindowTitle(window, str.c_str());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwWaitEvents();
     }
 
     glfwTerminate();
