@@ -8,6 +8,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 void errorCallback(int error, const char *description);
 GLFWwindow *create_glfw();
