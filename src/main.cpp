@@ -11,7 +11,7 @@ void errorCallback(int error, const char *description)
 /**
  * Create a GLFW-controlled window that OpenGL can use, and return a pointer to it.
  */
-GLFWwindow *create_glfw()
+GLFWwindow* create_glfw()
 {
     glfwInit();
 
@@ -74,6 +74,8 @@ int main()
     /** Create window and context for OpenGL to draw in. */
     GLFWwindow* window = create_glfw();
     glfwMakeContextCurrent(window);
+    /** Enable VSync */
+    glfwSwapInterval(1);
 
     glewExperimental = GL_TRUE;
     glewInit();
@@ -97,6 +99,7 @@ int main()
         -0.5f, -0.5f
     };
 
+    /** Bind vertices to current GL_ARRAY_BUFFER */
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -124,6 +127,7 @@ int main()
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
 
+    /** Bind Vertex Attribute Array (and VBO currently bound to GL_ARRAY_BUFFER) to posAttrib */
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -156,6 +160,7 @@ int main()
         /** Swap back buffer to front and poll for any events */
         glfwSwapBuffers(window);
         glfwWaitEvents();
+//        glfwPollEvents();
     }
 
     glfwTerminate();
