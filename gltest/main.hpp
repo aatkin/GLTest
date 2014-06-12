@@ -9,6 +9,10 @@
 #include <GL/glew.h>
 #include <GL/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 void errorCallback(int error, const char *description);
 GLFWwindow* create_glfw();
 GLuint loadShaderFromFile( std::string path, GLenum shaderType );
