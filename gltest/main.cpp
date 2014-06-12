@@ -183,6 +183,7 @@ int main()
 //    int total;
 //    std::string str;
     double delta;
+    double rotate_factor = 0.10f;
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
@@ -207,19 +208,21 @@ int main()
         glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 //        glFinish();
 
+
+        glfwSwapBuffers(window);
+//        glfwWaitEvents();
+        glfwPollEvents();
+
         end_t = clock();
-        delta = (double)(end_t - start_t) * 0.01f;
-        model = glm::rotate(model, (glm::mediump_float)delta, glm::vec3(0.5f, 1.0f, 0.0f));
+        delta = (double)(end_t - start_t) * rotate_factor;
+//        model = glm::mat4(1.0f);
+        model = glm::rotate(model, (glm::mediump_float)delta, glm::vec3(0.25f, 1.0f, 0.5f));
         MVP = projection * view * model;
         glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
 //        total = (int)(end_t - start_t);
 //        str = std::to_string(total) + "ms";
 //        std::cout << str << std::endl;
 //        glfwSetWindowTitle(window, str.c_str());
-
-        glfwSwapBuffers(window);
-//        glfwWaitEvents();
-        glfwPollEvents();
     }
 
     glfwTerminate();
