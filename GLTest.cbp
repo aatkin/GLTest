@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="lib" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -31,6 +32,7 @@
 		<Compiler>
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
+			<Add directory="lib" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:/glfw-3.0.4.bin.WIN64/lib-mingw" />
@@ -46,10 +48,10 @@
 			<Add directory="lib/glew" />
 			<Add directory="lib/glfw" />
 		</Linker>
-		<Unit filename="include/main.hpp" />
+		<Unit filename="gltest/main.cpp" />
+		<Unit filename="gltest/main.hpp" />
 		<Unit filename="shaders/triangle.frag" />
 		<Unit filename="shaders/triangle.vert" />
-		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
