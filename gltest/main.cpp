@@ -168,8 +168,8 @@ int main()
     /** Projection matrix uniform setup */
     glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(
-        glm::vec3(0.5f, 0.5f, 4.0f), // Camera is at (0, 0, 5), in World Space
-        glm::vec3(0, 0, 0), // and looks at the origin
+        glm::vec3(0.0f, 1.5f, 3.5f), // "Camera" position
+        glm::vec3(0, 0, 0), // "Camera" look-at vector
         glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
     glm::mat4 model = glm::mat4(1.0f);
@@ -178,8 +178,10 @@ int main()
     GLuint matrixID = glGetUniformLocation(shaderProgram, "MVP");
     glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
 
-    double start, stop, delta, rotation;
+    double start, stop, delta, rotation, elapsed_time = 0.0f;
     double x = 0.0f, y = 0.0f, move_speed = 0.0f;
+    glm::mat4 rotate_m4, translate_m4, mult_m4;
+    int frames = 0;
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
@@ -209,17 +211,32 @@ int main()
         /** Rotate a full revolution once every second */
         rotation = (2.0f * M_PI * delta) * (180.0f / M_PI);
 
-        move_speed += delta;
+        /** Circle around at the current draw speed */
         x = glm::cos(move_speed);
         y = glm::sin(move_speed);
-        std::cout << "x: " << x << ", y: " << y << std::endl;
 
         glfwPollEvents();
 
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-        model = glm::rotate(glm::mat4(1.0f), (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        MVP = projection * view * model;
-        glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+        translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x * 1.5f, y / 2.0f, 0.0f));
+        rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        MVP = projection * view * model * translate_m4 * rotate_m4;
+        glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(MVP));
+
+        move_speed += delta;
+
+        if(elapsed_time >= 1.0f)
+        {
+            std::string title = "Hello wurld - ";
+            title.append(std::to_string(frames));
+            title.append("fps");
+            glfwSetWindowTitle(window, title.c_str());
+//            std::cout << title << std::endl;
+            elapsed_time = 0.0f;
+            frames = 0;
+        }
+        elapsed_time += delta;
+        frames = frames + 1;
     }
 
     glfwTerminate();
