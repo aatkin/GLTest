@@ -7,7 +7,5 @@ A desktop-OpenGL test project, using
   - [GLM 0.9.5.3](http://glm.g-truc.net/0.9.5/index.html)
   - [Code::Blocks 13.12](http://www.codeblocks.org/)
 
-Developed and tested on Ubuntu 14.04 with Geforce GT415M and Nvidia binary driver version 331.38.
-
 ## Building ##
 See platform specific branches (windows/x11) for source and building instructions.
