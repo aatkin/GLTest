@@ -229,8 +229,8 @@ int main()
         if(elapsed_time >= 1.0f)
         {
             std::string title = "Hello wurld - ";
-            title.append(std::to_string(frames));
-            title.append("fps");
+            title.append(std::to_string((elapsed_time * 1000.0f) / frames));
+            title.append("ms");
             glfwSetWindowTitle(window, title.c_str());
 //            std::cout << title << std::endl;
             elapsed_time = 0.0f;
