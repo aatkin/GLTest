@@ -1,6 +1,0 @@
-*.depend
-*.layout
-bin/
-obj/
-*.xml
-*.dump
