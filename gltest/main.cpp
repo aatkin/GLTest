@@ -219,8 +219,9 @@ int main()
 
         translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x * 1.5f, y / 2.0f, 0.0f));
         rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        mult_m4 = translate_m4 * rotate_m4;
 
-        MVP = projection * view * model * translate_m4 * rotate_m4;
+        MVP = projection * view * model * mult_m4;
         glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(MVP));
 
         move_speed += delta;
