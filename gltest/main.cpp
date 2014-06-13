@@ -83,7 +83,6 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-//    glEnable(GL_STENCIL_TEST);
 
     std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
@@ -169,7 +168,7 @@ int main()
     /** Projection matrix uniform setup */
     glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(
-        glm::vec3(0.5, 1.0, 1.5), // Camera is at (0, 0, 5), in World Space
+        glm::vec3(0.5f, 0.5f, 4.0f), // Camera is at (0, 0, 5), in World Space
         glm::vec3(0, 0, 0), // and looks at the origin
         glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
@@ -179,11 +178,8 @@ int main()
     GLuint matrixID = glGetUniformLocation(shaderProgram, "MVP");
     glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
 
-    clock_t start_t, end_t;
-//    int total;
-//    std::string str;
-    double delta;
-    double rotate_factor = 0.10f;
+    double start, stop, delta, rotation;
+    double x = 0.0f, y = 0.0f, move_speed = 0.0f;
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
@@ -191,38 +187,39 @@ int main()
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
-        start_t = clock();
+        start = glfwGetTime();
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glClear(GL_COLOR_BUFFER_BIT);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
         glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
         glVertexAttribPointer(colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
         glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-//        glFinish();
-
+        glFinish();
 
         glfwSwapBuffers(window);
-//        glfwWaitEvents();
+
+        /** Get elapsed time in seconds */
+        stop = glfwGetTime();
+        delta = stop - start;
+        /** Rotate a full revolution once every second */
+        rotation = (2.0f * M_PI * delta) * (180.0f / M_PI);
+
+        move_speed += delta;
+        x = glm::cos(move_speed);
+        y = glm::sin(move_speed);
+        std::cout << "x: " << x << ", y: " << y << std::endl;
+
         glfwPollEvents();
 
-        end_t = clock();
-        delta = (double)(end_t - start_t) * rotate_factor;
-//        model = glm::mat4(1.0f);
-        model = glm::rotate(model, (glm::mediump_float)delta, glm::vec3(0.25f, 1.0f, 0.5f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+        model = glm::rotate(glm::mat4(1.0f), (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         MVP = projection * view * model;
         glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
-//        total = (int)(end_t - start_t);
-//        str = std::to_string(total) + "ms";
-//        std::cout << str << std::endl;
-//        glfwSetWindowTitle(window, str.c_str());
     }
 
     glfwTerminate();
@@ -231,6 +228,7 @@ int main()
     glDeleteShader(vertexShader);
 
     glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 
     glDeleteVertexArrays(1, &vao_triangle);
     return 0;
