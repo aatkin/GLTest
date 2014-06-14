@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#define PI 3.141592653589793234
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -15,6 +16,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 void errorCallback(int error, const char *description);
-GLFWwindow *create_glfw();
+GLFWwindow *create_glfw(char* title);
 GLuint loadShaderFromFile( std::string path, GLenum shaderType );
 #endif // MAIN_HPP_INCLUDED

@@ -13,7 +13,7 @@ namespace GLTest
     /**
      * Create a GLFW-controlled window that OpenGL can use, and return a pointer to it.
      */
-    GLFWwindow *create_glfw()
+    GLFWwindow *create_glfw(char* title)
     {
         glfwInit();
 
@@ -26,7 +26,7 @@ namespace GLTest
 
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-        GLFWwindow* window = glfwCreateWindow(960, 540, "Hello wurld", nullptr, nullptr); // Windowed
+        GLFWwindow* window = glfwCreateWindow(960, 540, title, nullptr, nullptr); // Windowed
 
         return window;
     }
@@ -75,8 +75,11 @@ namespace GLTest
 int main()
 {
     /** Create window and context for OpenGL to draw in. */
-    GLFWwindow* window = GLTest::create_glfw();
+    GLFWwindow* window = GLTest::create_glfw((char*)"Hello wurld");
     glfwMakeContextCurrent(window);
+
+    /** Enable VSync */
+    glfwSwapInterval(1);
 
     glewExperimental = GL_TRUE;
     glewInit();
@@ -182,10 +185,16 @@ int main()
     double x = 0.0f, y = 0.0f, move_speed = 0.0f;
     glm::mat4 rotate_m4, translate_m4, mult_m4;
     int frames = 0;
+    struct timespec sleep_value = {0};
+    int ms_multiplier = 1000000;
+    const float TARGET_FPS = 62.0f;
+    const float TARGET_MS = 1000.0f / TARGET_FPS;
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
     {
+        glfwPollEvents();
+
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
@@ -201,21 +210,16 @@ int main()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
         glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-        glFinish();
 
         glfwSwapBuffers(window);
+        glFinish();
 
-        /** Get elapsed time in seconds */
-        stop = glfwGetTime();
-        delta = stop - start;
         /** Rotate a full revolution once every second */
-        rotation = (2.0f * M_PI * delta) * (180.0f / M_PI);
+        rotation = (2.0f * PI * delta) * (180.0f / PI);
 
         /** Circle around at the current draw speed */
         x = glm::cos(move_speed);
         y = glm::sin(move_speed);
-
-        glfwPollEvents();
 
         translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x * 1.5f, y / 2.0f, 0.0f));
         rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -226,15 +230,24 @@ int main()
 
         move_speed += delta;
 
+        /** Get elapsed time in seconds */
+        stop = glfwGetTime();
+        delta = stop - start;
+
         if(elapsed_time >= 1.0f)
         {
             std::string title = "Hello wurld - ";
             title.append(std::to_string((elapsed_time * 1000.0f) / frames));
             title.append("ms");
             glfwSetWindowTitle(window, title.c_str());
-//            std::cout << title << std::endl;
             elapsed_time = 0.0f;
             frames = 0;
+        }
+        if((delta * 1000.0f) < TARGET_MS)
+        {
+            sleep_value.tv_nsec = (TARGET_MS - (delta * 1000.0f)) * ms_multiplier;
+            nanosleep(&sleep_value, nullptr);
+            delta = glfwGetTime() - start;
         }
         elapsed_time += delta;
         frames = frames + 1;
