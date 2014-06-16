@@ -78,9 +78,6 @@ int main()
     GLFWwindow* window = GLTest::create_glfw((char*)"Hello wurld");
     glfwMakeContextCurrent(window);
 
-    /** Enable VSync */
-    glfwSwapInterval(1);
-
     glewExperimental = GL_TRUE;
     glewInit();
 
@@ -97,34 +94,48 @@ int main()
     /** Vertex Buffer Object */
     GLuint vbo;
     glGenBuffers(1, &vbo);
-    GLfloat pyramid_vertices[] =
+//    GLfloat pyramid_vertices[] =
+//    {
+//        /** Top */
+//        0.0f, 0.5f, 0.0f,
+//        /** Bottom */
+//        -0.25f, 0.0f, 0.25f,
+//        0.25f, 0.0f, 0.25f,
+//        0.25f, 0.0f, -0.25f,
+//        -0.25f, 0.0f, -0.25f
+//    };
+    GLfloat cube_vertices[] =
     {
-        /** Top */
-        0.0f, 0.5f, 0.0f,
-        /** Bottom */
-        -0.25f, 0.0f, 0.25f,
-        0.25f, 0.0f, 0.25f,
-        0.25f, 0.0f, -0.25f,
-        -0.25f, 0.0f, -0.25f
+        /** Front */
+        -0.25f, 0.25f, 0.25f, // 0
+        0.25f, 0.25f, 0.25f, // 1
+        0.25f, -0.25f, 0.25f, // 2
+        -0.25f, -0.25f, 0.25f, // 3
+        /** Back */
+        -0.25f, 0.25f, -0.25f, // 4
+        0.25f, 0.25f, -0.25f, // 5
+        0.25f, -0.25f, -0.25f, // 6
+        -0.25f, -0.25f, -0.25f // 7
+
     };
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 
     /** Pyramid colors */
     GLuint vbo_color;
     glGenBuffers(1, &vbo_color);
     GLfloat pyramid_colors[] =
     {
-        /** Bottom face */
-        1.0f, 0.0f, 0.0f, 1.0f,
-        /** Back face */
-        0.8f, 0.0f, 0.0f, 1.0f,
-        /** Left face */
-        0.6f, 0.0f, 0.0f, 1.0f,
-        /** Right face */
-        0.4f, 0.0f, 0.0f, 1.0f,
-        /** Front face */
-        0.2f, 0.0f, 0.0f, 1.0f
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        0.7f, 0.0f, 0.0f,
+
+        0.7f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.0f,
     };
     glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
     glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_colors), pyramid_colors, GL_STATIC_DRAW);
@@ -132,22 +143,44 @@ int main()
     /** Element Buffer Object */
     GLuint ebo;
     glGenBuffers(1, &ebo);
-    GLuint elements[] =
+//    GLuint elements[] =
+//    {
+//        /** Bottom face */
+//        1, 2, 3,
+//        1, 3, 4,
+//        /** Back face */
+//        0, 3, 4,
+//        /** Left face */
+//        0, 4, 1,
+//        /** Right face */
+//        0, 3, 2,
+//        /** Front face */
+//        0, 2, 1
+//    };
+    GLuint cube_elements[] =
     {
-        /** Bottom face */
-        1, 2, 3,
-        1, 3, 4,
-        /** Back face */
-        0, 3, 4,
-        /** Left face */
-        0, 4, 1,
-        /** Right face */
-        0, 3, 2,
         /** Front face */
-        0, 2, 1
+        0, 1, 2,
+        0, 2, 3,
+        /** Back face */
+        4, 5, 6,
+        4, 6, 7,
+        /** Left face */
+        0, 3, 7,
+        0, 7, 4,
+        /** Right face */
+        1, 2, 6,
+        1, 6, 5,
+        /** Top face */
+        0, 1, 5,
+        0, 5, 4,
+        /** Bottom face */
+        2, 3, 7,
+        2, 7, 6
     };
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
 
     /** Load shaders for OpenGL to use. */
     GLuint vertexShader = GLTest::loadShaderFromFile("shaders/triangle.vert", GL_VERTEX_SHADER);
@@ -166,7 +199,7 @@ int main()
 
     GLint colorAttrib = glGetAttribLocation(shaderProgram, "color");
     glEnableVertexAttribArray(colorAttrib);
-    glVertexAttribPointer(colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     /** Projection matrix uniform setup */
     glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
@@ -179,7 +212,7 @@ int main()
     glm::mat4 MVP = projection * view * model;
 
     GLuint matrixID = glGetUniformLocation(shaderProgram, "MVP");
-    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(MVP));
 
     double start, stop, delta, rotation, elapsed_time = 0.0f;
     double x = 0.0f, y = 0.0f, move_speed = 0.0f;
@@ -187,8 +220,9 @@ int main()
     int frames = 0;
     struct timespec sleep_value = {0};
     int ms_multiplier = 1000000;
-    const float TARGET_FPS = 62.0f;
+    const float TARGET_FPS = 60.0f;
     const float TARGET_MS = 1000.0f / TARGET_FPS;
+    const GLuint CUBE_VERTICES = 36;
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
@@ -206,13 +240,13 @@ int main()
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
-        glVertexAttribPointer(colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, CUBE_VERTICES, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
-        glFinish();
+//        glFinish();
 
         /** Rotate a full revolution once every second */
         rotation = (2.0f * PI * delta) * (180.0f / PI);
@@ -222,7 +256,7 @@ int main()
         y = glm::sin(move_speed);
 
         translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x * 1.5f, y / 2.0f, 0.0f));
-        rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(1.0f, 1.0f, 0.0f));
         mult_m4 = translate_m4 * rotate_m4;
 
         MVP = projection * view * model * mult_m4;
