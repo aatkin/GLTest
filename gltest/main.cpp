@@ -23,6 +23,7 @@ namespace GLTest
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
 
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
@@ -125,20 +126,32 @@ int main()
     /** Pyramid colors */
     GLuint vbo_color;
     glGenBuffers(1, &vbo_color);
-    GLfloat pyramid_colors[] =
+//    GLfloat cube_colors[] =
+//    {
+//        1.0f, 0.0f, 0.0f,
+//        1.0f, 0.0f, 0.0f,
+//        1.0f, 0.0f, 0.0f,
+//        0.7f, 0.0f, 0.0f,
+//
+//        0.7f, 0.0f, 0.0f,
+//        0.5f, 0.0f, 0.0f,
+//        0.5f, 0.0f, 0.0f,
+//        0.5f, 0.0f, 0.0f,
+//    };
+    GLfloat cube_colors[] =
     {
         1.0f, 0.0f, 0.0f,
         1.0f, 0.0f, 0.0f,
         1.0f, 0.0f, 0.0f,
-        0.7f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
 
-        0.7f, 0.0f, 0.0f,
-        0.5f, 0.0f, 0.0f,
-        0.5f, 0.0f, 0.0f,
-        0.5f, 0.0f, 0.0f,
+        0.8f, 0.0f, 0.0f,
+        0.8f, 0.0f, 0.0f,
+        0.8f, 0.0f, 0.0f,
+        0.8f, 0.0f, 0.0f
     };
     glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_colors), pyramid_colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_colors), cube_colors, GL_STATIC_DRAW);
 
     /** Element Buffer Object */
     GLuint ebo;
@@ -204,7 +217,7 @@ int main()
     /** Projection matrix uniform setup */
     glm::mat4 projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0f, 1.5f, 3.5f), // "Camera" position
+        glm::vec3(0.0f, 1.5f, 2.5f), // "Camera" position
         glm::vec3(0, 0, 0), // "Camera" look-at vector
         glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
@@ -223,6 +236,9 @@ int main()
     const float TARGET_FPS = 60.0f;
     const float TARGET_MS = 1000.0f / TARGET_FPS;
     const GLuint CUBE_VERTICES = 36;
+
+    /** Set wireframe drawing on */
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /** Main loop of the program. */
     while(!glfwWindowShouldClose(window))
@@ -255,7 +271,7 @@ int main()
         x = glm::cos(move_speed);
         y = glm::sin(move_speed);
 
-        translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x * 1.5f, y / 2.0f, 0.0f));
+        translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x, y / 2.0f, 0.0f));
         rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f), glm::vec3(1.0f, 1.0f, 0.0f));
         mult_m4 = translate_m4 * rotate_m4;
 
