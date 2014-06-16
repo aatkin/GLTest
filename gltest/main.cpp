@@ -2,6 +2,8 @@
 
 namespace GLTest
 {
+    gl_resources RESOURCES;
+
     /**
      *  Error-Callback function for GLFW.
      */
@@ -23,11 +25,11 @@ namespace GLTest
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_SAMPLES, 0);
 
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-        GLFWwindow* window = glfwCreateWindow(960, 540, title, nullptr, nullptr); // Windowed
+        GLFWwindow* window = glfwCreateWindow(1280, 720, title, nullptr, nullptr); // Windowed
 
         return window;
     }
@@ -73,10 +75,39 @@ namespace GLTest
     }
 }
 
+GLuint create_cube(float width, float height, float depth)
+{
+    if(width < 0.0f || height < 0.0f || depth < 0.0f)
+    {
+        std::cout << "Error generating VBO" << std::endl;
+        return GL_FALSE;
+    }
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    GLfloat w = 0.001f * width, h = 0.001f * height, d = 0.001f * depth;
+    GLfloat cube_vertices[] =
+    {
+        /** Front */
+        -w, h, d, // 0
+        w, h, d, // 1
+        w, -h, d, // 2
+        -w, -h, d, // 3
+        /** Back */
+        -w, h, -d, // 4
+        w, h, -d, // 5
+        w, -h, -d, // 6
+        -w, -h, -d // 7
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return vbo;
+}
+
 int main()
 {
-    /** Create window and context for OpenGL to draw in. */
     GLFWwindow* window = GLTest::create_glfw((char*)"Hello wurld");
+    GLTest::RESOURCES.windows.push_back(window);
     glfwMakeContextCurrent(window);
 
     glewExperimental = GL_TRUE;
@@ -88,56 +119,23 @@ int main()
     std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
     /** Vertex Array Object */
-    GLuint vao_triangle;
-    glGenVertexArrays(1, &vao_triangle);
-    glBindVertexArray(vao_triangle);
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    GLTest::RESOURCES.vertex_arrays.push_back(&vao);
+    glBindVertexArray(vao);
 
     /** Vertex Buffer Object */
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-//    GLfloat pyramid_vertices[] =
-//    {
-//        /** Top */
-//        0.0f, 0.5f, 0.0f,
-//        /** Bottom */
-//        -0.25f, 0.0f, 0.25f,
-//        0.25f, 0.0f, 0.25f,
-//        0.25f, 0.0f, -0.25f,
-//        -0.25f, 0.0f, -0.25f
-//    };
-    GLfloat cube_vertices[] =
+    GLuint vbo = create_cube(350.0f, 350.0f, 350.0f);
+    if(vbo == GL_FALSE)
     {
-        /** Front */
-        -0.25f, 0.25f, 0.25f, // 0
-        0.25f, 0.25f, 0.25f, // 1
-        0.25f, -0.25f, 0.25f, // 2
-        -0.25f, -0.25f, 0.25f, // 3
-        /** Back */
-        -0.25f, 0.25f, -0.25f, // 4
-        0.25f, 0.25f, -0.25f, // 5
-        0.25f, -0.25f, -0.25f, // 6
-        -0.25f, -0.25f, -0.25f // 7
-
-    };
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+        exit(-1);
+    }
+    GLTest::RESOURCES.buffers.push_back(&vbo);
 
     /** Pyramid colors */
     GLuint vbo_color;
     glGenBuffers(1, &vbo_color);
-//    GLfloat cube_colors[] =
-//    {
-//        1.0f, 0.0f, 0.0f,
-//        1.0f, 0.0f, 0.0f,
-//        1.0f, 0.0f, 0.0f,
-//        0.7f, 0.0f, 0.0f,
-//
-//        0.7f, 0.0f, 0.0f,
-//        0.5f, 0.0f, 0.0f,
-//        0.5f, 0.0f, 0.0f,
-//        0.5f, 0.0f, 0.0f,
-//    };
+    GLTest::RESOURCES.buffers.push_back(&vbo_color);
     GLfloat cube_colors[] =
     {
         1.0f, 0.0f, 0.0f,
@@ -156,20 +154,8 @@ int main()
     /** Element Buffer Object */
     GLuint ebo;
     glGenBuffers(1, &ebo);
-//    GLuint elements[] =
-//    {
-//        /** Bottom face */
-//        1, 2, 3,
-//        1, 3, 4,
-//        /** Back face */
-//        0, 3, 4,
-//        /** Left face */
-//        0, 4, 1,
-//        /** Right face */
-//        0, 3, 2,
-//        /** Front face */
-//        0, 2, 1
-//    };
+    GLTest::RESOURCES.buffers.push_back(&ebo);
+    // Draw order only works on cubes created with create_cube() function
     GLuint cube_elements[] =
     {
         /** Front face */
@@ -192,7 +178,6 @@ int main()
         2, 7, 6
     };
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
 
     /** Load shaders for OpenGL to use. */
@@ -200,11 +185,16 @@ int main()
     GLuint fragmentShader = GLTest::loadShaderFromFile("shaders/triangle.frag", GL_FRAGMENT_SHADER);
 
     GLuint shaderProgram = glCreateProgram();
+    GLTest::RESOURCES.shader_programs.push_back(shaderProgram);
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glBindFragDataLocation(shaderProgram, 0, "outColor");
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
+
+    /** Delete shaders after they have been linked to save memory */
+    glDeleteShader(fragmentShader);
+    glDeleteShader(vertexShader);
 
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
@@ -262,10 +252,9 @@ int main()
         glDrawElements(GL_TRIANGLES, CUBE_VERTICES, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
-//        glFinish();
 
         /** Rotate a full revolution once every second */
-        rotation = (2.0f * PI * delta) * (180.0f / PI);
+        rotation = (2.0f * PI * delta);
 
         /** Circle around at the current draw speed */
         x = glm::cos(move_speed);
@@ -305,12 +294,10 @@ int main()
 
     glfwTerminate();
     glDeleteProgram(shaderProgram);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(vertexShader);
 
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
 
-    glDeleteVertexArrays(1, &vao_triangle);
+    glDeleteVertexArrays(1, &vao);
     return 0;
 }
