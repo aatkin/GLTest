@@ -1,8 +1,8 @@
 #version 150
 
 in vec3 position;
-in vec4 color;
-out vec4 out_color;
+in vec3 color;
+out vec3 out_color;
 uniform mat4 MVP;
 
 void main()
