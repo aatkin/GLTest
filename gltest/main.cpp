@@ -42,34 +42,34 @@ namespace GLTest
 
         // Source file loaded
         if(sourceFile)
-            {
-                // Get shader source
-                shaderString.assign((std::istreambuf_iterator< char > (sourceFile)),
-                                    std::istreambuf_iterator< char >());
-                // Create shader ID
-                shaderID = glCreateShader(shaderType);
-                // Set shader source
-                const GLchar *shaderSource = shaderString.c_str();
-                glShaderSource(shaderID, 1, (const GLchar **) &shaderSource, NULL);
-                // Compile shader source
-                glCompileShader(shaderID);
-                // Check shader for errors
-                GLint shaderCompiled = GL_FALSE;
-                glGetShaderiv(shaderID, GL_COMPILE_STATUS, &shaderCompiled);
+        {
+            // Get shader source
+            shaderString.assign((std::istreambuf_iterator< char > (sourceFile)),
+                                std::istreambuf_iterator< char >());
+            // Create shader ID
+            shaderID = glCreateShader(shaderType);
+            // Set shader source
+            const GLchar *shaderSource = shaderString.c_str();
+            glShaderSource(shaderID, 1, (const GLchar **) &shaderSource, NULL);
+            // Compile shader source
+            glCompileShader(shaderID);
+            // Check shader for errors
+            GLint shaderCompiled = GL_FALSE;
+            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &shaderCompiled);
 
-                if(shaderCompiled != GL_TRUE)
-                    {
-                        std::cout << "Unable to compile shader: " <<
-                                  shaderID << ", source: " << shaderSource <<
-                                  std::endl;
-                        glDeleteShader(shaderID);
-                        shaderID = 0;
-                    }
-            }
-        else
+            if(shaderCompiled != GL_TRUE)
             {
-                printf("Unable to open file %s\n", path.c_str());
+                std::cout << "Unable to compile shader: " <<
+                          shaderID << ", source: " << shaderSource <<
+                          std::endl;
+                glDeleteShader(shaderID);
+                shaderID = 0;
             }
+        }
+        else
+        {
+            printf("Unable to open file %s\n", path.c_str());
+        }
 
         return shaderID;
     }
@@ -107,25 +107,25 @@ namespace GLTest
         glfwTerminate();
 
         while(!GLTest::RESOURCES.vertex_arrays.empty())
-            {
-                std::cout << "Cleaning up vertex array object..." << std::endl;
-                glDeleteVertexArrays(1, GLTest::RESOURCES.vertex_arrays.back());
-                GLTest::RESOURCES.vertex_arrays.pop_back();
-            }
+        {
+            std::cout << "Cleaning up vertex array object..." << std::endl;
+            glDeleteVertexArrays(1, GLTest::RESOURCES.vertex_arrays.back());
+            GLTest::RESOURCES.vertex_arrays.pop_back();
+        }
 
         while(!GLTest::RESOURCES.buffers.empty())
-            {
-                std::cout << "Cleaning up buffer object..." << std::endl;
-                glDeleteBuffers(1, GLTest::RESOURCES.buffers.back());
-                GLTest::RESOURCES.buffers.pop_back();
-            }
+        {
+            std::cout << "Cleaning up buffer object..." << std::endl;
+            glDeleteBuffers(1, GLTest::RESOURCES.buffers.back());
+            GLTest::RESOURCES.buffers.pop_back();
+        }
 
         while(!GLTest::RESOURCES.shader_programs.empty())
-            {
-                std::cout << "Cleaning up shader program..." << std::endl;
-                glDeleteProgram(GLTest::RESOURCES.shader_programs.back());
-                GLTest::RESOURCES.shader_programs.pop_back();
-            }
+        {
+            std::cout << "Cleaning up shader program..." << std::endl;
+            glDeleteProgram(GLTest::RESOURCES.shader_programs.back());
+            GLTest::RESOURCES.shader_programs.pop_back();
+        }
     }
 } // namespace GLTest
 
@@ -243,55 +243,55 @@ int main()
 
     // Main loop of the program
     while(!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, GL_TRUE);
+
+        start = glfwGetTime();
+
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
+        glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glDrawElements(GL_TRIANGLES, CUBE_VERTICES, GL_UNSIGNED_INT, 0);
+
+        glfwSwapBuffers(window);
+        glFinish();
+
+        // Rotate a full revolution once every second
+        rotation = (2.0f * PI * delta);
+        // Circle around at the current draw speed
+        x = glm::cos(move_speed);
+        y = glm::sin(move_speed);
+        translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x, y / 2.0f, 0.0f));
+        rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f),
+                                glm::vec3(1.0f, 1.0f, 0.0f));
+        mult_m4 = translate_m4 * rotate_m4;
+        MVP = projection * view * model * mult_m4;
+        glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(MVP));
+        move_speed += delta;
+        // Get elapsed time in seconds
+        stop = glfwGetTime();
+        delta = stop - start;
+
+        if(elapsed_time >= 1.0f)
         {
-            glfwPollEvents();
-
-            if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-                glfwSetWindowShouldClose(window, GL_TRUE);
-
-            start = glfwGetTime();
-
-            glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
-            glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glDrawElements(GL_TRIANGLES, CUBE_VERTICES, GL_UNSIGNED_INT, 0);
-
-            glfwSwapBuffers(window);
-            glFinish();
-
-            // Rotate a full revolution once every second
-            rotation = (2.0f * PI * delta);
-            // Circle around at the current draw speed
-            x = glm::cos(move_speed);
-            y = glm::sin(move_speed);
-            translate_m4 = glm::translate(glm::mat4(1.0f), glm::vec3(x, y / 2.0f, 0.0f));
-            rotate_m4 = glm::rotate(rotate_m4, (glm::mediump_float)(rotation / 3.0f),
-                                    glm::vec3(1.0f, 1.0f, 0.0f));
-            mult_m4 = translate_m4 * rotate_m4;
-            MVP = projection * view * model * mult_m4;
-            glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm::value_ptr(MVP));
-            move_speed += delta;
-            // Get elapsed time in seconds
-            stop = glfwGetTime();
-            delta = stop - start;
-
-            if(elapsed_time >= 1.0f)
-                {
-                    std::string title = "Hello wurld - ";
-                    title.append(std::to_string((elapsed_time * 1000.0f) / frames));
-                    title.append("ms");
-                    glfwSetWindowTitle(window, title.c_str());
-                    elapsed_time = 0.0f;
-                    frames = 0;
-                }
-
-            elapsed_time += delta;
-            frames = frames + 1;
+            std::string title = "Hello wurld - ";
+            title.append(std::to_string((elapsed_time * 1000.0f) / frames));
+            title.append("ms");
+            glfwSetWindowTitle(window, title.c_str());
+            elapsed_time = 0.0f;
+            frames = 0;
         }
+
+        elapsed_time += delta;
+        frames = frames + 1;
+    }
 
     GLTest::clean_resources();
     return 0;
